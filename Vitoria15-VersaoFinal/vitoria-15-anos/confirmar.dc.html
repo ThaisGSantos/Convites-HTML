@@ -196,11 +196,11 @@ class Component extends DCLogic {
     const chave = Component.chave(d.nome);
     const url = this.props.scriptUrl || 'https://script.google.com/macros/s/AKfycbxa_cdypr9Mp9bmTigyf8z5nzIgDlRcBtfIYSZw8FrMAyoODr0oOKuwer-aus4wZritRg/exec';
     const fone = Component.fone(d.telefone);
-    // já respondeu neste aparelho?
-    let jaRespondeu = Component.locais().indexOf(chave) !== -1;
-    let motivo = jaRespondeu ? 'nome' : '';
-    // ou já consta na planilha (mesmo nome, mesmo WhatsApp, ou já incluído por outra pessoa)?
-    if (!jaRespondeu && url) {
+    // a planilha é a autoridade; a trava local só vale se não houver conexão
+    let jaRespondeu = false;
+    let motivo = '';
+    let consultou = false;
+    if (url) {
       try {
         const ac = new AbortController();
         const tmr = setTimeout(() => ac.abort(), 8000);
@@ -208,6 +208,7 @@ class Component extends DCLogic {
         clearTimeout(tmr);
         const lista = await res.json();
         if (Array.isArray(lista)) {
+          consultou = true;
           for (const r of lista) {
             if (Component.chave(r.nome) === chave) { jaRespondeu = true; motivo = 'nome'; break; }
             if (fone && Component.fone(r.telefone) === fone) { jaRespondeu = true; motivo = 'fone'; break; }
@@ -218,8 +219,12 @@ class Component extends DCLogic {
             }
           }
         }
-      } catch (err) { /* sem conexão: deixa seguir */ }
+      } catch (err) { /* sem conexão: usa a trava local */ }
     }
+    if (!consultou && Component.locais().indexOf(chave) !== -1) {
+      jaRespondeu = true; motivo = 'nome';
+    }
+    if (consultou && !jaRespondeu) Component.esquecer(chave);
     if (jaRespondeu) {
       this._motivo = motivo;
       this.setState({ status: 'bloqueado', nome: d.nome.split(' ')[0], whatsLink: this.buildWhatsAlteracao(d) });
@@ -257,6 +262,12 @@ class Component extends DCLogic {
   }
   static locais() {
     try { return JSON.parse(localStorage.getItem('vitoria_rsvp') || '[]'); } catch (e) { return []; }
+  }
+  static esquecer(chave) {
+    try {
+      const l = Component.locais().filter((x) => x !== chave);
+      localStorage.setItem('vitoria_rsvp', JSON.stringify(l));
+    } catch (e) {}
   }
   static guardar(chave) {
     try {

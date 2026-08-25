@@ -167,6 +167,11 @@ class Component extends DCLogic {
     }
     const sim = rows.filter(r => String(r.resposta).toLowerCase().indexOf('n') !== 0);
     const n = (v) => { const x = parseInt(v, 10); return isNaN(x) ? 0 : x; };
+    const titulo = (v) => String(v == null ? '' : v).trim().toLowerCase().split(/\s+/)
+      .map((w) => (['de','da','do','das','dos','e'].indexOf(w) !== -1 && w.length < 4)
+        ? w
+        : w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
     const soData = (v) => {
       const s = String(v == null ? '' : v).trim();
       const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -195,7 +200,7 @@ class Component extends DCLogic {
           + (this.state.rows.length > rows.length ? ' · ' + this.state.rows.length + ' envios no total' : '')
         : ''),
       linhas: rows.map(r => ({
-        nome: r.nome,
+        nome: titulo(r.nome),
         resposta: r.resposta,
         detalhe: [r.adultos ? r.adultos + ' adulto(s)' : null, n(r.criancas) ? r.criancas + ' criança(s)' : null, soData(r.data)]
           .filter(Boolean).join(' · ')
