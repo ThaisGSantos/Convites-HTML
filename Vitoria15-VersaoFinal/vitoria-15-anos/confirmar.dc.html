@@ -238,7 +238,14 @@ class Component extends DCLogic {
       }
     }
     Component.guardar(chave);
-    this.setState({ status: 'done', nome: d.nome.split(' ')[0], whatsLink: this.buildWhats(d) });
+    const link = this.buildWhats(d);
+    this.setState({ status: 'done', nome: d.nome.split(' ')[0], whatsLink: link });
+    // abre o WhatsApp da Cris automaticamente com a resposta já escrita
+    const janela = window.open(link, '_blank');
+    if (!janela) {
+      clearTimeout(this._redir);
+      this._redir = setTimeout(() => { window.location.href = link; }, 1600);
+    }
   };
 
   static fone(v) {
@@ -290,8 +297,8 @@ class Component extends DCLogic {
       dicaAcompanhantes: 'Você é a primeira pessoa da contagem — liste as demais aqui.',
       instrucaoFinal: s.status === 'bloqueado'
         ? 'Toque acima para falar com a Cris no WhatsApp.'
-        : 'Toque no botão acima e depois em enviar, dentro do WhatsApp.',
-      textoWhats: s.status === 'bloqueado' ? 'Falar com a Cris' : 'Enviar aviso no WhatsApp',
+        : 'Estamos abrindo o WhatsApp da Cris com a sua resposta — só falta tocar em enviar. Se não abrir, use o botão acima.',
+      textoWhats: s.status === 'bloqueado' ? 'Falar com a Cris' : 'Abrir WhatsApp agora',
       podeOutra: s.status === 'done',
       onResposta: this.onResposta,
       submit: this.submit,
