@@ -1,0 +1,21 @@
+REPOSITÓRIO "convites" — GITHUB PAGES
+
+COMO PUBLICAR (grátis, sem prazo)
+1. github.com > New repository > nome: convites > Public > Create.
+2. Na página do repositório: "uploading an existing file".
+3. Arraste TODO o conteúdo desta pasta (index.html, LEIA-ME.txt e a
+   pasta vitoria-15-anos) e clique em Commit changes.
+4. Settings > Pages > Source: "Deploy from a branch" > Branch: main
+   > pasta: / (root) > Save.
+5. Em ~1 minuto o site fica em:
+   https://SEU-USUARIO.github.io/convites/
+
+ENDEREÇOS
+Portal ............ /convites/
+Convite Vitoria ... /convites/vitoria-15-anos/
+Painel dos pais ... /convites/vitoria-15-anos/painel.dc.html
+                    senha: vitoria15
+
+PRÓXIMAS FESTAS
+Basta criar outra pasta (ex.: joao-formatura/) e adicionar um cartão
+no index.html.
